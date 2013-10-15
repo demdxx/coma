@@ -1,0 +1,17 @@
+
+{
+  "project": "coma",
+  "version": "0.0.1-pre-pre-alpha",
+  "license": "MIT",
+  "deps": [
+    # ...
+  ],
+  "apps": [
+    # default all from src
+  ],
+  # HOOKS
+  # "init": [] or "script/path",
+  # "finish": [] or "script/path",
+  # "surcess": [] or "script/path",
+  # "failure": [] or "script/path",
+}

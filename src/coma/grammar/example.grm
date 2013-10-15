@@ -1,0 +1,18 @@
+# Grammar file example for JSON file
+# Multi comments
+
+lexer: # Lexer tokinizer
+
+	digit = "0123456789".
+	name = "abcdefghijklmnopqrstuvwxyz0123456789".
+
+parser: # Parser rules
+
+	digit           = '-'digit.
+	string          = '\'' %* '\'' ; '"' %* '"'.
+	key             = name ; string.
+	value           = key ; 'false' ; 'true' ; array.
+
+	object          = '{' [objectKeyvalue [',' objectKeyvalue]*] '}'.
+	objectKeyvalue  = key ':' value.
+	array           = '[' [value [',' value]*] ']'.
