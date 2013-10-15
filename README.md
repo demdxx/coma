@@ -7,6 +7,7 @@ Coma
 
 The project is a context free grammar parser.
 
+
 Algorithm
 =========
 
@@ -15,6 +16,7 @@ Algorithm
  3. Consistently apply the rules to the entire input stream forming a collection of non-terminals and non-terminals.
  4. When finished successfully with the processing of the next rules start applying all the rules from the beginning, until there will be no rules that we can do.
  5. On the way out we get a parse tree AST
+
 
 Grammar constructor example
 ===========================
@@ -30,7 +32,7 @@ lexer: # Lexer tokinizer
 
 parser: # Parser rules
 
-  digit           = '-'digit | ^[0-9]+$.
+  digit           = '-'digit ; ^[0-9]+$.
   string          = '\'' %* '\'' ; '"' %* '"'.
   key             = name ; string.
   value           = key ; 'false' ; 'true' ; array.
@@ -39,6 +41,12 @@ parser: # Parser rules
   objectKeyvalue  = key ':' value.
   array           = '[' [value [',' value]*] ']'.
 ```
+
+Project tools
+=============
+
+https://github.com/demdxx/goproj
+
 
 License MIT
 ===========
