@@ -46,6 +46,44 @@ parser:
   section = NEWLINE?'lexer:' ; NEWLINE?'parser:'.
   rule = NEWLINE? word '=' !comment+ ';'.
 
+JSON BNF:
+
+element
+  = '[' tag-name ',' attributes ',' element-list ']'
+  | '[' tag-name ',' attributes ']'
+  | '[' tag-name ',' element-list ']'
+  | '[' tag-name ']'
+  | string
+  ;
+tag-name
+  = string
+  ;
+attributes
+  = '{' attribute-list '}'
+  | '{' '}'
+  ;
+attribute-list
+  = attribute ',' attribute-list
+  | attribute
+  ;
+attribute
+  = attribute-name ':' attribute-value
+  ;
+attribute-name
+  = string
+  ;
+attribute-value
+  = string
+  | number
+  | 'true'
+  | 'false'
+  | 'null'
+  ;
+element-list
+  = element ',' element-list
+  | element
+  ;
+
 */
 
 var options = []interface{}{
@@ -59,15 +97,19 @@ var options = []interface{}{
   rules.MakeRule(-1, "comment", "'#'%*'\n'", nil),
   rules.MakeRule(-1, "comment", "comment comment+", nil),
   rules.MakeRule(0, "word", "^[a-zA-Z0-9]+$", nil),
+  rules.MakeRule(0, "string", "'\\''%*'\\''", nil),
+  rules.MakeRule(0, "string", "'\"'%*'\"'", nil),
   rules.MakeRule(0, "section", "word ':' comment*", nil),
   rules.MakeRule(0, "section", "word ':' '\n'", nil),
-  // rules.MakeRule(0, "string", "'\\''!\n*'\\''", nil),
-  // rules.MakeRule(0, "string", "'\"'!\n*'\"'", nil),
-  // rules.MakeRule(0, "rule", "word '=' ruleItemBeg* ruleItemEnd", nil),
-  // rules.MakeRule(0, "ruleBeg", "word '='", nil),
   // rules.MakeRule(0, "ruleItemBeg", "!'.'*';'", nil),
   // rules.MakeRule(0, "ruleItemEnd", "!';'*'.'", nil),
-  rules.MakeRule(0, "rule", "word '='%*'.'", nil),
+  // rules.MakeRule(0, "rule", "word '=' ruleItemBeg* ruleItemEnd", nil),
+  // rules.MakeRule(0, "ruleBeg", "word '='", nil),
+  rules.MakeRule(0, "rule", "word '='%*'.'[['\n'][ ]]*", nil),
+  // rules.MakeRule(0, "rule", "word '=' [!';'+ ';']* '.'", nil),
+  // rules.MakeRule(0, "rule", "rule'\n'+", nil),
+  // rules.MakeRule(0, "rules", "rule+", nil),
+  rules.MakeRule(0, "section_block", "section '\n'* rule+", nil),
 }
 
 func MakeGrammar() *parser.Parser {

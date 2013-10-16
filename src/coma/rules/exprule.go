@@ -42,10 +42,12 @@ const (
   token_anything
   token_rule
   token_super
+  token_alternative
 )
 
 type iptoken interface {
   addToken(t *ptoken)
+  rollUp(i int)
 }
 
 type ptoken struct {
@@ -230,6 +232,14 @@ func (r *ExpRule) addToken(t *ptoken) {
   }
 }
 
+/**
+ * Roll up conditions
+ *
+ * @param roll counter
+ */
+func (r *ExpRule) rollUp(i int) {
+}
+
 func (r *ptoken) addToken(t *ptoken) {
   if nil == r.tokens {
     r.tokens = make([]*ptoken, 1)
@@ -240,7 +250,16 @@ func (r *ptoken) addToken(t *ptoken) {
 }
 
 /**
+ * Roll up conditions
+ *
+ * @param roll counter
+ */
+func (r *ptoken) rollUp(i int) {
+}
+
+/**
  * Test token item
+ *
  * @param Tested node
  * @param rules []
  * @param count matched items
@@ -336,6 +355,15 @@ func tests(rule IRule, tokens []*ptoken, n *ast.Node, rules []IRule) int {
   return count
 }
 
+/**
+ * Check additional params before add token
+ *
+ * @param t tocken
+ * @param exp string
+ * @param char position
+ * @param container
+ * @return offset
+ */
 func parse_addtoken(t *ptoken, exp string, pos int, container iptoken) int /* offset */ {
   offset := 0
   if pos+1 < len(exp) {
@@ -353,10 +381,18 @@ func parse_addtoken(t *ptoken, exp string, pos int, container iptoken) int /* of
   return offset
 }
 
-func parse_exp_const_string(exp string, begin int) string {
+/**
+ * Parse string
+ *
+ * @param exp string
+ * @param begin char
+ * @return offset, string
+ */
+func parse_exp_const_string(exp string, begin int) (int, string) {
   esc := false
   value := ""
-  for i := begin; i < len(exp); i++ {
+  i := begin
+  for ; i < len(exp); i++ {
     c := rune(exp[i])
     switch c {
     case '\'':
@@ -364,7 +400,7 @@ func parse_exp_const_string(exp string, begin int) string {
         value += "'"
         esc = false
       } else {
-        return value
+        return i - begin, value
       }
     case '\\':
       if esc {
@@ -380,7 +416,7 @@ func parse_exp_const_string(exp string, begin int) string {
       value += string(c)
     }
   }
-  return value
+  return -1, value
 }
 
 func parse_exp_until(exp string, begin int, end rune, container iptoken) int /* end index */ {
@@ -402,9 +438,12 @@ func parse_exp_until(exp string, begin int, end rune, container iptoken) int /* 
       } else {
         switch c {
         case '\'': // parse const string
-          s := parse_exp_const_string(exp, i+1)
+          l, s := parse_exp_const_string(exp, i+1)
+          if l < 0 {
+            return  -1
+          }
           t = &ptoken{vtype: token_string, value: s, isnot: not}
-          i += len(s) + 1
+          i += l+1
           not = false
         case '[':
           t = &ptoken{vtype: token_super, optional: true, isnot: not}
@@ -423,6 +462,9 @@ func parse_exp_until(exp string, begin int, end rune, container iptoken) int /* 
           not = false
         case '!':
           not = true
+        case '|':
+          container.rollUp()
+          not = false
         case end: // Is end
           if len(value) > 0 {
             container.addToken(&ptoken{vtype: token_rule, value: value, isnot: not})
