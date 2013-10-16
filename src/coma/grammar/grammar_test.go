@@ -55,7 +55,6 @@ func TestParser(t *testing.T) {
   // Run parser
   //
   grammar.Parse(func(n *ast.Node) bool {
-    // fmt.Println(n.ToString(true))
     fmt.Println(n.ToStringByPrintFunc(0, func(step int, n *ast.Node) string {
       result := ""
       for i := 0; i < step*4; i++ {
@@ -66,12 +65,12 @@ func TestParser(t *testing.T) {
           result += "` `"
         } else {
           if nil != n.Link {
-            result += "EXP: " + escapeString(n.Link.(rules.IRule).ToString(true)) + " "
+            result += "EXP: " + escapeString(n.Link.(rules.IRule).ToString(false)) + " "
           }
           result += "VAL: " + escapeString(n.Token.Value)
         }
       } else if nil != n.Link {
-        result += "EXP: " + escapeString(n.Link.(rules.IRule).ToString(true)) + " >>> " + escapeString(n.ToString(true))
+        result += "EXP: " + escapeString(n.Link.(rules.IRule).ToString(false)) + " >>> " + escapeString(n.ToString(true))
       }
       return result
     }))

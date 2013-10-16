@@ -132,13 +132,13 @@ func (rule *ExpRule) Test(node *ast.Node, rules []IRule) int {
 func (rule *ExpRule) ToString(detail bool) string {
   result := rule.Name + " : " + rule.Expression
   if detail {
-    result += " DETAIL"
     if nil != rule.tokens {
+      result += " DETAIL "
       for _, it := range rule.tokens {
         result += "\n" + it.toTreeString(0, 4)
       }
     } else {
-      result += " => <error>"
+      result += " DETAIL => <error>"
     }
   }
   return result

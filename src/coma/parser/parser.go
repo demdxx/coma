@@ -128,7 +128,7 @@ func (p *Parser) normalize(astree *ast.Node) {
   // Normalize AST tree
   for j := 0; j < len(p.rules); j++ {
     r := p.rules[j]
-    c := astree.RollUp(r.IsRight(), func(cur *ast.Node) (int /* count */, interface{} /* rule */) {
+    c := astree.Child.RollUp(r.IsRight(), func(cur *ast.Node) (int /* count */, interface{} /* rule */) {
       count := r.Test(cur, p.rules)
       // fmt.Println("count", count, cur.Token)
       if count >= 0 {
@@ -180,12 +180,12 @@ func (p *Parser) Parse(f func(*ast.Node) bool) bool {
   }
 
   // Normalize AST tree
-  p.normalize(astree.Child)
+  p.normalize(astree)
 
   // if nil != astree.Child {
   //   astree.Child.Clean()
   // }
-  fmt.Println("#@#@#", astree.ToTreeString(0, 4))
+  // fmt.Println("#@#@#", astree.ToTreeString(0, 4))
 
   // Check first level AST
   if p.checkAst(astree) {
