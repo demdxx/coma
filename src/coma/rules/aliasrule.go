@@ -1,3 +1,5 @@
+// Project coma
+//
 // Copyright (C) <2013> Dmitry Ponomarev <demdxx@gmail.com>
 //
 //

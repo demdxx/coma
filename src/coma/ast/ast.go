@@ -103,22 +103,17 @@ func (n *Node) ToTreeString(spaces int, step int) string {
   return result
 }
 
-func (n *Node) ToStringByPrintFunc(spaces, step int, pf func (spaces, step int, n *Node) int, string) string {
-  sp, s := pf(spaces, step, n)
-  if nil == s {
+func (n *Node) ToStringByPrintFunc(step int, pf func (step int, n *Node) string) string {
+  result := pf(step, n)
+  if "" == result {
     return "<error>"
-  }
-
-  var result string = ""
-  for i := 0; i < sp; i++ {
-    result += " "
   }
 
   result += "\n"
   if nil != n.Child {
     c := n.Child
     for nil != c {
-      result += c.ToStringByPrintFunc(spaces, step, pf)
+      result += c.ToStringByPrintFunc(step + 1, pf)
       c = c.Next
     }
   }

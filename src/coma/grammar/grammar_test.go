@@ -24,11 +24,20 @@ package grammar
 
 import (
   "coma/ast"
+  "coma/token"
+  "coma/rules"
   "io"
   "testing"
+  "strings"
   "os"
   "fmt"
 )
+
+func escapeString(str string) string {
+  v := strings.Replace(str, "\n", "\\n", -1)
+  v = strings.Replace(v, "\t", "\\t", -1)
+  return v
+}
 
 func TestParser(t *testing.T) {
 	file, err := os.Open("example.grm")
@@ -42,9 +51,30 @@ func TestParser(t *testing.T) {
   grammar := MakeGrammar()
   grammar.SetStream(reader)
 
+  /////////////////////////////////////////////////////////////////////////////
   // Run parser
+  //
   grammar.Parse(func(n *ast.Node) bool {
-    fmt.Println(n.ToString(true))
+    // fmt.Println(n.ToString(true))
+    fmt.Println(n.ToStringByPrintFunc(0, func(step int, n *ast.Node) string {
+      result := ""
+      for i := 0; i < step*4; i++ {
+        result += " "
+      }
+      if nil != n.Token {
+        if token.Separator == n.Token.Code {
+          result += "` `"
+        } else {
+          if nil != n.Link {
+            result += "EXP: " + escapeString(n.Link.(rules.IRule).ToString(true)) + " "
+          }
+          result += "VAL: " + escapeString(n.Token.Value)
+        }
+      } else if nil != n.Link {
+        result += "EXP: " + escapeString(n.Link.(rules.IRule).ToString(true)) + " >>> " + escapeString(n.ToString(true))
+      }
+      return result
+    }))
     return true
   })
 }
